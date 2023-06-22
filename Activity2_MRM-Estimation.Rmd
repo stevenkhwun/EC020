@@ -1,0 +1,85 @@
+---
+title: 'Activity 2 - MRM: Estimation'
+author: "AW"
+date: "2023/6/22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Load the required package
+library(foreign)
+```
+
+```{r}
+# Read the data
+data <- read.dta("Activity2/CARD.dta")
+```
+
+The data has 34 variables and 3010 observations. We only care about a few of these, namely "wage", "educ", "IQ", "black", and "exper".
+
+```{r}
+data_for_analysis <- subset(data, select = c(wage, educ, IQ, black, exper)) 
+head(data_for_analysis)
+```
+
+```{r}
+# Create log wages
+data_for_analysis$lwage <- log(data_for_analysis$wage)
+```
+
+```{r}
+# Run OLS regression
+bivariate_OLS <- lm(lwage ~ educ, data=data_for_analysis)
+summary(bivariate_OLS)
+```
+
+```{r}
+# plot residuals against education
+residual <- residuals(bivariate_OLS)    # get the residuals
+plot(data_for_analysis$educ, residual,
+     xlab = "Years of education", ylab = "Residuals",
+     main = "Residuals vs. Years of education")
+```
+
+```{r}
+# get R squared
+summary(bivariate_OLS)$r.squared
+```
+
+```{r}
+# get adjusted R squared
+summary(bivariate_OLS)$adj.r.squared
+```
+
+```{r}
+# run multiple OLS regression
+multivar_OLS <- lm(lwage ~ educ + exper, data=data_for_analysis)
+summary(multivar_OLS)
+```
+
+```{r}
+# running auxilliary regression
+aux_reg <- lm(exper ~ educ, data=data_for_analysis)
+summary(aux_reg)
+```
+
+Adding a second control: IQ
+
+```{r}
+# IQ has missing value
+summary(data_for_analysis$IQ)
+```
+
+We include the option of `na.action = na.exclude` in the `lm()` function to exclude the missing value. In fact, `R` automatically drops all missing observations in a regression. However, it is good practice to include option as it will force you to think about what observations you drop from your sample an possible selection issues.
+
+```{r}
+# runing second multiple OLS regression
+multivariate_OLS <- lm(lwage ~ educ + IQ + exper, data=data_for_analysis,
+                       na.action=na.exclude)
+summary(multivariate_OLS)
+```
+
