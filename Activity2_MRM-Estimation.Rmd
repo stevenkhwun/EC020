@@ -1,6 +1,5 @@
 ---
 title: 'Activity 2 - MRM: Estimation'
-author: "AW"
 date: "2023/6/22"
 output: html_document
 ---
@@ -9,12 +8,57 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Running OLS regression
 
 > Learning points:
-> 
-> * library `foreign`
+>
+> * read csv file using `read.csv()`
+> * run OLS regression using `lm()`
+> * create plots using `plot()`
+> * read dta file using `read.dta()` in library `foreign`
 
+# Running an OLS Regression
+
+```{r}
+# load csv data (library foreign not required)
+exp <- read.csv("Activity1/lalondeexp.csv")
+head(exp)
+```
+
+```{r}
+# run OLS regression
+OLS <- lm(re78 ~ treat, data=exp)
+summary(OLS)
+```
+
+Note that R automatically includes an intercept.
+
+```{r}
+# get coefficients
+coefficients <- coef(OLS)
+coefficients
+# get residuals
+residuals <- residuals(OLS)
+head(residuals)
+# get fitted values
+fitted_values <- fitted.values(OLS)
+head(fitted_values)
+```
+
+```{r}
+# plot the residuals against treatment variable
+plot(exp$treat, residuals,
+     xlab = "Treatment", ylab = "Residuals",
+     main = "Residuals vs. Treatment")
+```
+
+```{r}
+# plot the residuals against fitted values
+plot(fitted_values, residuals,
+     xlab = "Fitted values", ylab = "Residuals",
+     main = "Residuals vs. Fitted Values")
+```
+
+# Multiple Regression Model: Estimation
 
 ```{r}
 # Load the required package
