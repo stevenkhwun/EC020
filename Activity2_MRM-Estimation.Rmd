@@ -9,6 +9,13 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Running OLS regression
+
+> Learning points:
+> 
+> * library `foreign`
+
+
 ```{r}
 # Load the required package
 library(foreign)
