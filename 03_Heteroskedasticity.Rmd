@@ -1,0 +1,21 @@
+---
+title: 'Heteroskedasticity'
+date: "2023/6/22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+> Learning points:
+>
+> * package `wooldridge` for all the dataset of wooldridge's book
+> * use `data()` function to load the dataset from the package
+> * calculate critical value for *t-test* using `qt()` function
+> * conduct *F-test* using `linearHypothesis()` function in `car` package
+> * calculate confidence interval using `confint()` function in R `stats` package
+
+
+# Multivariate OLS Regression
