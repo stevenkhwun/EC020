@@ -11,12 +11,12 @@ knitr::opts_chunk$set(echo = TRUE)
 
 > Learning points:
 >
-
 > * package `wooldridge` for all the dataset of wooldridge's book
 > * use `data()` function to load the dataset from the package
+> * calculate critical value for *t-test* using `qt()` function
 
 
-# Running an OLS Regression
+# Multivariate OLS Regression
 
 ```{r}
 # load the gpa1 dataset from the package wooldridge
@@ -30,9 +30,46 @@ $$ colGPA_i = \beta_0 + \beta_1 hsGPA_i + \beta_2 ACT_i + \beta_3 skipped_i + \e
 
 ```{r}
 # run OLS regression
-
-
+multivariate_OLS <- lm(colGPA ~ hsGPA + ACT + skipped, data=gpa1)
+summary(multivariate_OLS)
 ```
+
+## Testing a Single Hypothesis
+
+Notice that next to the coefficients, R automatically displays the standard errors associated with the respective coefficient _under the assumption of homoskedasticity._ Next to the standard error, you see the t-statistic associated with each coefficient. Lastly, R also displays the p-values.
+
+*Null hypothesis*
+
+We are interested in knowing whether the coefficient on `skipped` is statistically significantly different from zero. The null hypothesis in this case is
+$$\beta_3 = 0$$
+The two-sided alternative hypothesis in this case is
+$$\beta_3 \neq 0$$ 
+
+
+*t-statistic*
+
+One way to test whether a coefficient is statistically significantly different from zero is to conduct a *t-test*. As we now know, R automatically calculates the t-statistics for us. In this case, we find a t-statistic of $-3.20$. Note that you can calculate this statistic yourself: $(-.083 - 0)/.026 = -3.20$. We now want to compare this value with some critical value and R also allows us to compute the critical value as follows
+
+```{r}
+# critical value for two-sided test
+p = .05
+df = 141 - 4
+qt(p/2, df, lower.tail = FALSE)
+```
+
+The third argument `lower.tail = FALSE` tells R that we are interested in the "probability to the right" of *p*. Notice that since we are doing a two-tailed test, if you wrote `lower.tail = TRUE` you would get the same critical value, just with a minus in front. 
+
+Given this critical value, we can now compare the absolute value of our t-statistic (3.2) with 1.977. Clearly, $3.20 > 1.977$, and hence we conclude that our estimate of $-.083$ is statistically significantly different from zero at the 5% significance level and reject the null hypothesis stated above.
+
+In case you were testing a one-sided alternative hypothesis (instead of a two-sided one), we would need to find a different critical value. We can do this in R as follows
+```{r eval=FALSE}
+# critical value for one-sided test
+qt(p, df, lower.tail=FALSE)
+```
+
+
+
+
 
 
 

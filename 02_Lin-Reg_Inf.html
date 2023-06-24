@@ -175,15 +175,14 @@ pre code {
 
 <blockquote>
 <p>Learning points:</p>
-</blockquote>
-<blockquote>
 <ul>
 <li>package <code>wooldridge</code> for all the dataset of wooldridge’s book</li>
 <li>use <code>data()</code> function to load the dataset from the package</li>
+<li>calculate critical value for <em>t-test</em> using <code>qt()</code> function</li>
 </ul>
 </blockquote>
-<div id="running-an-ols-regression" class="section level1">
-<h1>Running an OLS Regression</h1>
+<div id="multivariate-ols-regression" class="section level1">
+<h1>Multivariate OLS Regression</h1>
 <pre class="r"><code># load the gpa1 dataset from the package wooldridge
 library(wooldridge)
 data(&quot;gpa1&quot;)
@@ -201,7 +200,47 @@ head(gpa1, 3)</code></pre>
 ## 2       0       1      1        1        1
 ## 3       0       1      1        1        1</code></pre>
 <p>We are interested in the following multivariate regression <span class="math display">\[ colGPA_i = \beta_0 + \beta_1 hsGPA_i + \beta_2 ACT_i + \beta_3 skipped_i + \epsilon_i \]</span></p>
-<pre class="r"><code># run OLS regression</code></pre>
+<pre class="r"><code># run OLS regression
+multivariate_OLS &lt;- lm(colGPA ~ hsGPA + ACT + skipped, data=gpa1)
+summary(multivariate_OLS)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = colGPA ~ hsGPA + ACT + skipped, data = gpa1)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.85698 -0.23200 -0.03935  0.24816  0.81657 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  1.38955    0.33155   4.191 4.95e-05 ***
+## hsGPA        0.41182    0.09367   4.396 2.19e-05 ***
+## ACT          0.01472    0.01056   1.393  0.16578    
+## skipped     -0.08311    0.02600  -3.197  0.00173 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.3295 on 137 degrees of freedom
+## Multiple R-squared:  0.2336, Adjusted R-squared:  0.2168 
+## F-statistic: 13.92 on 3 and 137 DF,  p-value: 5.653e-08</code></pre>
+<div id="testing-a-single-hypothesis" class="section level2">
+<h2>Testing a Single Hypothesis</h2>
+<p>Notice that next to the coefficients, R automatically displays the standard errors associated with the respective coefficient <em>under the assumption of homoskedasticity.</em> Next to the standard error, you see the t-statistic associated with each coefficient. Lastly, R also displays the p-values.</p>
+<p><em>Null hypothesis</em></p>
+<p>We are interested in knowing whether the coefficient on <code>skipped</code> is statistically significantly different from zero. The null hypothesis in this case is <span class="math display">\[\beta_3 = 0\]</span> The two-sided alternative hypothesis in this case is <span class="math display">\[\beta_3 \neq 0\]</span></p>
+<p><em>t-statistic</em></p>
+<p>One way to test whether a coefficient is statistically significantly different from zero is to conduct a <em>t-test</em>. As we now know, R automatically calculates the t-statistics for us. In this case, we find a t-statistic of <span class="math inline">\(-3.20\)</span>. Note that you can calculate this statistic yourself: <span class="math inline">\((-.083 - 0)/.026 = -3.20\)</span>. We now want to compare this value with some critical value and R also allows us to compute the critical value as follows</p>
+<pre class="r"><code># critical value for two-sided test
+p = .05
+df = 141 - 4
+qt(p/2, df, lower.tail = FALSE)</code></pre>
+<pre><code>## [1] 1.977431</code></pre>
+<p>The third argument <code>lower.tail = FALSE</code> tells R that we are interested in the “probability to the right” of <em>p</em>. Notice that since we are doing a two-tailed test, if you wrote <code>lower.tail = TRUE</code> you would get the same critical value, just with a minus in front.</p>
+<p>Given this critical value, we can now compare the absolute value of our t-statistic (3.2) with 1.977. Clearly, <span class="math inline">\(3.20 &gt; 1.977\)</span>, and hence we conclude that our estimate of <span class="math inline">\(-.083\)</span> is statistically significantly different from zero at the 5% significance level and reject the null hypothesis stated above.</p>
+<p>In case you were testing a one-sided alternative hypothesis (instead of a two-sided one), we would need to find a different critical value. We can do this in R as follows</p>
+<pre class="r"><code># critical value for one-sided test
+qt(p, df, lower.tail=FALSE)</code></pre>
+</div>
 </div>
 
 
