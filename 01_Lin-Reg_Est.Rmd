@@ -1,5 +1,5 @@
 ---
-title: 'Activity 2 - MRM: Estimation'
+title: 'Linear Regression: Estimation'
 date: "2023/6/22"
 output: html_document
 ---
@@ -33,7 +33,14 @@ OLS <- lm(re78 ~ treat, data=exp)
 summary(OLS)
 ```
 
-Note that R automatically includes an intercept.
+Note that R automatically includes an intercept. If you want to run an OLS without the intercept, add `- 1` at the end of the equation, just like:
+
+```{r}
+# run OLS regression without intercept
+OLS_no_intercept <- lm(re78 ~ treat - 1, data =exp)
+summary(OLS_no_intercept)
+```
+
 
 ```{r}
 # get coefficients
@@ -127,7 +134,7 @@ multivar_OLS <- lm(lwage ~ educ + exper, data=data_for_analysis)
 summary(multivar_OLS)
 ```
 
-**Omitted variable bias formula**
+#### Omitted variable bias formula
 
 The fact that the coefficient on education changes when we include work experience as a control variable leads us to conclude that the estimate on education in the bivariate regression was (downward) biased. To see why this is, recall the **omitted variable bias formula**:
 
@@ -169,7 +176,7 @@ summary(multivariate_OLS)$r.squared
 summary(multivariate_OLS)$adj.r.squared
 ```
 
-**FWL Theorem**
+#### FWL Theorem
 
 The FWL theorem says that whether we run the multivariate regression as above leads to the same coefficient on education as if we (i) run an OLS regression of education on our controls and (ii) run an OLS regression of log wages on the residual obtained from the regression in (i). We already ran the multivariate regression above, so we can here implement the two step procedure to see if we get the same coefficient on education. To implement the procedure, run the following code:
 
@@ -183,3 +190,39 @@ step2 <- lm(lwage ~ step1_residuals, data=data_for_analysis, na.action=na.exclud
 summary(step2)
 ```
 
+## Multicollinearity
+
+We extend the model to include a dummy variable indicating whether an individual is black or not.
+
+$$ log(wage)_i = \gamma_0 + \gamma_1 educ_i + \gamma_2 IQ_i + \gamma_3 exper_i + \gamma_4 black_i + v_i $$
+```{r}
+# run OLS regression
+multivariate_OLS2 <- lm(lwage ~ educ + IQ + exper + black, data=data_for_analysis,
+                        na.action=na.exclude)
+summary(multivariate_OLS2)
+```
+
+Now create a new variable called `nblack`, which is "the opposit" of the variable `black`.
+
+```{r}
+# create the variabel nblack
+data_for_analysis$nblack = 1 - data_for_analysis$black
+```
+
+```{r}
+# run an extreme case of multicollinearity
+multivariate_OLS3 <- lm(lwage ~ educ + IQ + exper + black + nblack, data=data_for_analysis,
+                        na.action=na.exclude)
+summary(multivariate_OLS3)
+```
+
+For perfect multicollinearity, R automatically omits the new regressor.
+
+However, if we were to drop the intercept from the regression, R will estimate a coefficient for both variables.
+
+```{r}
+# run an extreme case of multicollinearity
+multivariate_OLS3 <- lm(lwage ~ educ + IQ + exper + black + nblack - 1,
+                        data=data_for_analysis, na.action=na.exclude)
+summary(multivariate_OLS3)
+```
