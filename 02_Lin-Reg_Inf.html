@@ -179,6 +179,7 @@ pre code {
 <li>package <code>wooldridge</code> for all the dataset of wooldridge’s book</li>
 <li>use <code>data()</code> function to load the dataset from the package</li>
 <li>calculate critical value for <em>t-test</em> using <code>qt()</code> function</li>
+<li>conduct <em>F-test</em> using <code>linearHypothesis()</code> function in <code>car</code> package</li>
 </ul>
 </blockquote>
 <div id="multivariate-ols-regression" class="section level1">
@@ -240,6 +241,25 @@ qt(p/2, df, lower.tail = FALSE)</code></pre>
 <p>In case you were testing a one-sided alternative hypothesis (instead of a two-sided one), we would need to find a different critical value. We can do this in R as follows</p>
 <pre class="r"><code># critical value for one-sided test
 qt(p, df, lower.tail=FALSE)</code></pre>
+<p><em>p-values</em></p>
+<p>R computed the <em>p-values</em> associated with the coefficients. By comparing the calculated <em>p-value</em> with 0.05, we reject the null hypothesis if the p-value is less than 0.05 (at the 5% level).</p>
+<p>The <em>p-value</em> from a <em>F-test</em> as well as the one from a <em>t-test</em> are the same when testing a single hypothesis. We have above seen that the <em>p-value</em> from the <em>t-test</em> is <span class="math inline">\(0.00173\)</span>. To conduct a <em>F-test</em> by the <code>linearHypothesis()</code> function in the <code>car</code> package as follow:</p>
+<pre class="r"><code># conduct F-test
+library(car)
+linearHypothesis(multivariate_OLS, c(&quot;skipped = 0&quot;))</code></pre>
+<pre><code>## Linear hypothesis test
+## 
+## Hypothesis:
+## skipped = 0
+## 
+## Model 1: restricted model
+## Model 2: colGPA ~ hsGPA + ACT + skipped
+## 
+##   Res.Df    RSS Df Sum of Sq     F   Pr(&gt;F)   
+## 1    138 15.982                               
+## 2    137 14.873  1    1.1095 10.22 0.001725 **
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 </div>
 </div>
 

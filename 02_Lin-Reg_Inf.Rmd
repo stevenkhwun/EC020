@@ -14,6 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 > * package `wooldridge` for all the dataset of wooldridge's book
 > * use `data()` function to load the dataset from the package
 > * calculate critical value for *t-test* using `qt()` function
+> * conduct *F-test* using `linearHypothesis()` function in `car` package
 
 
 # Multivariate OLS Regression
@@ -67,9 +68,17 @@ In case you were testing a one-sided alternative hypothesis (instead of a two-si
 qt(p, df, lower.tail=FALSE)
 ```
 
+*p-values*
 
+R computed the *p-values* associated with the coefficients. By comparing the calculated *p-value* with 0.05, we reject the null hypothesis if the p-value is less than 0.05 (at the 5% level). 
 
+The *p-value* from a *F-test* as well as the one from a *t-test* are the same when testing a single hypothesis. We have above seen that the *p-value* from the *t-test* is $0.00173$. To conduct a *F-test* by the `linearHypothesis()` function in the `car` package as follow:
 
+```{r, message=FALSE}
+# conduct F-test
+library(car)
+linearHypothesis(multivariate_OLS, c("skipped = 0"))
+```
 
 
 
