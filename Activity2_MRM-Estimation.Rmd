@@ -15,6 +15,9 @@ knitr::opts_chunk$set(echo = TRUE)
 > * run OLS regression using `lm()`
 > * create plots using `plot()`
 > * read dta file using `read.dta()` in library `foreign`
+> * subset data using `subset()`
+> * the option of `na.action = na.exclude` in the `lm()` function
+
 
 # Running an OLS Regression
 
@@ -65,7 +68,7 @@ plot(fitted_values, residuals,
 library(foreign)
 ```
 
-```{r}
+```{r, warning=FALSE}
 # Read the data
 data <- read.dta("Activity2/CARD.dta")
 ```
@@ -82,11 +85,17 @@ head(data_for_analysis)
 data_for_analysis$lwage <- log(data_for_analysis$wage)
 ```
 
+## Bivariate Regression
+
+$$ log(wage)_i = \beta_0 + \beta_1 educ_i + \epsilon_i $$
+
 ```{r}
 # Run OLS regression
 bivariate_OLS <- lm(lwage ~ educ, data=data_for_analysis)
 summary(bivariate_OLS)
 ```
+
+The estimated coefficient on education is 0.052 implies that an additional year of schooling is associated with a 5.2 percent increase in wages. 
 
 ```{r}
 # plot residuals against education
@@ -106,11 +115,28 @@ summary(bivariate_OLS)$r.squared
 summary(bivariate_OLS)$adj.r.squared
 ```
 
+## Multivariate Regressions
+
+*Adding one control*
+
+$$ log(wage)_i = \gamma_0 + \gamma_1 educ_i + \gamma_2 exper_i  + v_i $$
+
 ```{r}
 # run multiple OLS regression
 multivar_OLS <- lm(lwage ~ educ + exper, data=data_for_analysis)
 summary(multivar_OLS)
 ```
+
+**Omitted variable bias formula**
+
+The fact that the coefficient on education changes when we include work experience as a control variable leads us to conclude that the estimate on education in the bivariate regression was (downward) biased. To see why this is, recall the **omitted variable bias formula**:
+
+$$ \hat{\beta}_1 = \hat{\gamma}_1 + \hat{\gamma}_2 \hat{\pi}$$
+
+where $\hat{\pi}$ is the OLS estimate from a regression of $exper$ on $educ$. The bivariate and multivariate regressions we ran provide us with three of these coefficients, i.e.
+$$.052 = .093 + .041 \hat{\pi}$$
+
+Solving for $\hat{\pi}$ we get $\hat{\pi} = -1$. This implies, that in a regression of $exper$ on $edu$, the coefficient on $educ$ should be $-1$. We can test this by running the following auxilliary regression
 
 ```{r}
 # running auxilliary regression
@@ -118,7 +144,9 @@ aux_reg <- lm(exper ~ educ, data=data_for_analysis)
 summary(aux_reg)
 ```
 
-Adding a second control: IQ
+*Adding a second control: IQ*
+
+$$ log(wage)_i = \gamma_0 + \gamma_1 educ_i + \gamma_2 IQ_i + \gamma_3 exper_i + v_i $$
 
 ```{r}
 # IQ has missing value
@@ -132,5 +160,26 @@ We include the option of `na.action = na.exclude` in the `lm()` function to excl
 multivariate_OLS <- lm(lwage ~ educ + IQ + exper, data=data_for_analysis,
                        na.action=na.exclude)
 summary(multivariate_OLS)
+```
+
+```{r}
+# get R squared
+summary(multivariate_OLS)$r.squared
+# get adjusted R squared
+summary(multivariate_OLS)$adj.r.squared
+```
+
+**FWL Theorem**
+
+The FWL theorem says that whether we run the multivariate regression as above leads to the same coefficient on education as if we (i) run an OLS regression of education on our controls and (ii) run an OLS regression of log wages on the residual obtained from the regression in (i). We already ran the multivariate regression above, so we can here implement the two step procedure to see if we get the same coefficient on education. To implement the procedure, run the following code:
+
+```{r}
+# first step OLs
+step1 <- lm(educ ~ IQ + exper, data=data_for_analysis, na.action=na.exclude)
+# get residuals for step 1
+data_for_analysis$step1_residuals <- residuals(step1)
+# second step OLS
+step2 <- lm(lwage ~ step1_residuals, data=data_for_analysis, na.action=na.exclude)
+summary(step2)
 ```
 
