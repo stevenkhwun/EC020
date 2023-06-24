@@ -15,6 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 > * use `data()` function to load the dataset from the package
 > * calculate critical value for *t-test* using `qt()` function
 > * conduct *F-test* using `linearHypothesis()` function in `car` package
+> * calculate confidence interval using `confint()` function in R `stats` package
 
 
 # Multivariate OLS Regression
@@ -80,8 +81,58 @@ library(car)
 linearHypothesis(multivariate_OLS, c("skipped = 0"))
 ```
 
+*Confidence intervals*
+
+The 95% confidence interval for the coefficient on `skipped` should be approximately $[-.083 \pm 1.96*0.026] = [-.134,-.032]$. We could ask R to compute this for us as follows
+
+```{r}
+# calculate confidence interval
+confint(multivariate_OLS, 'skipped', level=0.95)
+```
+
+*A new null hypothesis*
+
+Suppose that instead of the above, we now want to test the following null hypothesis
+$$ \beta_1 + \beta_2 = 0$$ 
+against its two-sided alternative
+$$ \beta_1 + \beta_2 \neq 0$$ 
 
 
+We are here testing whether the sum of the parameters on `hsGPA` and `ACT` is statistically significantly different from zero or not. We can do this in R directly by running the following command 
+
+```{r}
+# F-test for sum of parameters
+linearHypothesis(multivariate_OLS, c("hsGPA + ACT = 0"))
+```
+
+As above, we use the `linearHypothesis()` function in R to conduct a *F-test*. While the first argument is again the same as above, the second argument looks a bit different here since we want to test a different hypothesis. Specifically, we want to test whether $\beta_1 + \beta_2 = 0$, which is expressed as the variable names associated to these parameters in R. Note that you could rewrite this command as follows to get the same result
+
+```{r, eval=FALSE}
+# F-test for sum of parameters (alternative way)
+linearHypothesis(multivariate_OLS, c("hsGPA =- ACT "))
+```
+
+Either command will yield an *F-statistic* of 22.258.
+
+We have therefore seen that we can use *F-* and *t-tests* to test single hypotheses. When testing multiple hypotheses, however, you will have to rely on only the *F-test*. The *t-test* will not be applicable in that case. 
+
+## Testing Multiple Hypotheses
+
+Now, suppose we want to test the following null hyoptheses
+$$\beta_1 = \beta_2 = \beta_3 = 0$$
+In words, we are testing whether all our coefficients (except the intercept) are jointly zero. Be aware that we are now testing multiple hypotheses (3 to be precise). 
+
+```{r}
+# testing multiple hypotheses
+linearHypothesis(multivariate_OLS, c("hsGPA=0", "ACT=0", "skipped=0"))
+```
+
+Look at the summary of our original regression again by typing 
+```{r}
+# summary statistics of original regression
+summary(multivariate_OLS)
+```
+Notice that the last line provides you with an *F-statistic* and a *p-value* and notice that these are equivalent to the *F-statistic* and *p-value* we just calculated. Hence, if you want to test the null hypotheses that all your parameters are zero (except the intercept), you can rely on the summary output of our regression without having to compute the *F-statistic*. However, if you wanted to test whether $\beta_1$ and $\beta_2$ are jointly zero only (i.e. omitting $\beta_3$ in our example above), then you cannot rely on this output and have to compute the *F-statistic* yourself. 
 
 
 
