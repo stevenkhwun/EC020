@@ -11,11 +11,85 @@ knitr::opts_chunk$set(echo = TRUE)
 
 > Learning points:
 >
-> * package `wooldridge` for all the dataset of wooldridge's book
-> * use `data()` function to load the dataset from the package
-> * calculate critical value for *t-test* using `qt()` function
-> * conduct *F-test* using `linearHypothesis()` function in `car` package
-> * calculate confidence interval using `confint()` function in R `stats` package
+> * calculate heteroskedasticity robust standard errors using `coeftest()` function
+> * F-test under heteroskedasticity assumption using `linearHypothesis()` function
 
 
-# Multivariate OLS Regression
+
+# Wage Equation Set-Up
+
+We aim to look at the relationship between log wages and education and experience. Mathematically, 
+$$log(wage_i) = \alpha_0 + \alpha_1 educ_i + \alpha_2 exper_i + \epsilon_i$$
+```{r}
+# load the data
+library(wooldridge)
+data("wage2")
+```
+
+# OLS with Heteroskedasticity Robust Standard Errors
+
+```{r}
+# run the regression
+wage2_ols1 <- lm(lwage ~ educ + + exper, data=wage2)
+summary(wage2_ols1)     # homosk. SEs
+```
+
+The standard errors R reports using the `summary()` command are calculated under the assumption of homoskedasticity.
+
+The assumption of homoskedasiticty is often not satisfied. Indeed, we might want to report heteroskedasiticty robust standard errors. It turns out, that doing this in R is very easy. The regression we run using the `lm()` command stays the same. Then, when displaying the results, instead of using the `summary()` command, we use the `coeftest()` command as follows (make sure you have installed the packages `lmtest` and `sandwich` for this).
+
+```{r message=FALSE}
+# calculate heteroskedasticity robust s.e.
+library(lmtest)      # load the required package
+library(sandwich)    # load the required package
+coeftest(wage2_ols1, vcov=vcovHC(wage2_ols1, type = "HC1"))   # heterosk. SEs
+```
+
+The first input into the `coeftest()` function is the object we have estimated above. The second one is a bit more complicated to when not using matrix notation. Technically, we want to specify the covariance matrix of the estimated coefficients. We do this by using the `vcovHC()` function. This function consistently estimates the covariance matrix of the coefficients of the `wage2_ols1` regression. The "type" arguments specified the "type of heteroskedasticity robust standard errors" we want. This last part is not of great importance. While the inputs into the `coeftest()` function are a bit more complicated, the above code can just be copied to any other regression you ran to then calculate the heteroskedasticity robust standard errors. Furthermore, as you can see from the output, the interpretation and layout of the output is the same as what we're already used to.
+
+The *F-test* is not provided in this output. Luckily, we can still use the `linearHypothesis()` command to report a *F-test* that is robust to heteroskedasticity. Just for illustration purposes, suppose we add a few additional controls into our wage regression and want to test whether all the controls on the right-hand side are jointly zero (assuming heteroskedasticity). In R, we could type
+
+```{r}
+# run the regression
+wage2_ols2<- lm(lwage ~ educ + exper + age + married + black + 
+                  south, data=wage2)
+```
+
+```{r message=FALSE}
+# F-test assuming heteroskedasticity
+library(car)
+linearHypothesis(wage2_ols2, c("exper", "age", "married", "black", "south"), 
+                 c(0, 0, 0, 0, 0), vcov=hccm(wage2_ols2, type="hc1"))
+```
+
+The regression with added control is standard. Then, to conduct the *F-test*, we use the `linearHypothesis()` command. Everything is as we're used to, except that the last argument into the function is once again asking us to input the covariance matrix of the coefficients. This time, we get this covariance matrix using the `hccm()` function. This is just an alternative function to the `vocHC()` function we used above. You can convince yourself of this by typing 
+
+```{r eval=FALSE}
+# F-test assuming heteroskedasticity (alternative coding)
+linearHypothesis(wage2_ols2, c("exper", "age", "married", "black", "south"), 
+                 c(0, 0, 0, 0, 0), vcov=vcovHC(wage2_ols2, type="HC1")) # F-test
+```
+The output is exactly the same. 
+
+# Exploring Heteroskedasticity
+
+We will consider three ways of exploring heteroskedasticity in more detail. The first is to plot our data. The second and third are to test for heteroskedasticity using the Breusch-Pagan and White tests, respectively.
+
+## Visual Inspection
+
+To visually inspect whether we should be concerned about heteroskedasticity, we could plot the residuals squared against either the predicted values of the outcome or against any of our regressors of interest.
+
+```{r}
+# plot the residuals against the predicted values
+wage2$ols1resid <- resid(wage2_ols1)            # get residuals
+wage2$fitted1wage <- fitted.values(wage2_ols1)  # get fitted values
+plot(wage2$fitted1wage, wage2$ols1resid, xlab="Fitted Log Wage", ylab="Residuals")
+```
+
+```{r}
+# plot the residuals square against the predicted values
+wage2$ols1residsq <- wage2$ols1resid^2          # square the residuals
+plot(wage2$fitted1wage, wage2$ols1residsq, xlab="Fitted Log Wage", ylab="Residuals Square")
+```
+
+
