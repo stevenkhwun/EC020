@@ -13,6 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 >
 > * calculate heteroskedasticity robust standard errors using `coeftest()` function
 > * F-test under heteroskedasticity assumption using `linearHypothesis()` function
+> * use `ggplot()` function of the `ggplot2` package
 
 
 
@@ -24,6 +25,7 @@ $$log(wage_i) = \alpha_0 + \alpha_1 educ_i + \alpha_2 exper_i + \epsilon_i$$
 # load the data
 library(wooldridge)
 data("wage2")
+dim(wage2)
 ```
 
 # OLS with Heteroskedasticity Robust Standard Errors
@@ -92,4 +94,9 @@ wage2$ols1residsq <- wage2$ols1resid^2          # square the residuals
 plot(wage2$fitted1wage, wage2$ols1residsq, xlab="Fitted Log Wage", ylab="Residuals Square")
 ```
 
+The plot of the fitted wages against the residuals does not neccesarily suggest that heteroskedasticity is a huge issue.
 
+```{r}
+library(ggplot2)
+ggplot(wage2, aes(x=fitted1wage, y=ols1resid)) + geom_point()
+```
