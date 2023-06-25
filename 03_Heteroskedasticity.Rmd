@@ -94,9 +94,58 @@ wage2$ols1residsq <- wage2$ols1resid^2          # square the residuals
 plot(wage2$fitted1wage, wage2$ols1residsq, xlab="Fitted Log Wage", ylab="Residuals Square")
 ```
 
-The plot of the fitted wages against the residuals does not neccesarily suggest that heteroskedasticity is a huge issue.
+The plot of the fitted wages against the residuals does not necessarily suggest that heteroskedasticity is a huge issue.
 
+Other ways to create plots in R:
 ```{r}
+# plot the residuals against the predicted values using ggplot()
 library(ggplot2)
 ggplot(wage2, aes(x=fitted1wage, y=ols1resid)) + geom_point()
 ```
+
+## Breusch-Pagan Test
+
+
+The Breusch-Pagan test provides one way to test heteroskedasticity more formally. The implementation of this test consists of three steps. The first step is to run the regression of interest and to then compute the residuals squared of said regression. Notice that we have already done this above. The residuals squared in our case are called $ols1residsq$. The second step is to regress these squared residuals on all explanatory variables (education and experience in our case) and to compute the usual F-statistic. The third step is to then look at the output of this test and to conclude whether we have a heteroskedasticity issue or not. The null hypothesis is that our assumption of homoskedasticity holds (i.e. that the coefficients on education and experience are jointly zero). In R, implementing step 2 is simple, i.e.
+
+```{r}
+# Breusch-Pagan Test step 2
+BP_step2 <- lm(ols1residsq ~ educ + exper, data=wage2)
+summary(BP_step2)
+```
+
+The resulting F-statistic is $2.042$ with a p-value of $0.1303$, implying that we fail to reject the null hypothesis of homoskedasticity. Hence, the Breusch-Pagan test confirms what we suspected when looking at the data visually: we do not seem to have a heteroskedasticity problem.
+
+
+## White Test
+
+There are two cases of the White test. The first and general case regresses the residuals squared on education, experience, as well as the square of each term plus their interaction. The second more special case of the White test regresses the residuals squared on the fitted values of log wages as well as the square of these fitted values. Otherwise, the test procedure is analogous to the Breusch-Pagan test discussed above. In R, this is all very straightforward, i.e. 
+
+```{r}
+# define squares and interactions for white test
+wage2$educsq <- wage2$educ^2              # educ squared
+wage2$expersq <- wage2$exper^2            # exper squared
+wage2$educexper <- wage2$educ*wage2$exper # educ exper interaction
+```
+
+```{r}
+# define fitted values and squares for the special white test
+wage2$olsfitted <- fitted.values(wage2_ols1)
+wage2$olsfittedsq <- wage2$olsfitted^2
+```
+
+```{r}
+# Usual White test
+White_1 <- lm(ols1residsq ~ educ + exper + educsq + expersq + educexper,
+              data=wage2)
+summary(White_1)
+```
+
+```{r}
+# Special White test
+White_2 <- lm(ols1residsq ~ olsfitted + olsfittedsq, data=wage2)
+summary(White_2)
+```
+
+The resulting F-statistics are $0.8436$ and $.02164$ with p-values of $0.5189$ and $0.8055$, respectively for the usual and special White test. Clearly, we again fail to reject the null hypothesis of homoskedasticity. Thus, the White test confirms that heteroskedasticity does not seem to pose an issue in our data. 
+
