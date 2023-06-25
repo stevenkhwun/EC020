@@ -353,8 +353,8 @@ summary(multivar_OLS)</code></pre>
 ## Residual standard error: 0.4017 on 3007 degrees of freedom
 ## Multiple R-squared:  0.1813, Adjusted R-squared:  0.1808 
 ## F-statistic:   333 on 2 and 3007 DF,  p-value: &lt; 2.2e-16</code></pre>
-<div id="omitted-variable-bias-formula" class="section level4">
-<h4>Omitted variable bias formula</h4>
+<div id="omitted-variable-bias-formula" class="section level3">
+<h3>Omitted variable bias formula</h3>
 <p>The fact that the coefficient on education changes when we include work experience as a control variable leads us to conclude that the estimate on education in the bivariate regression was (downward) biased. To see why this is, recall the <strong>omitted variable bias formula</strong>:</p>
 <p><span class="math display">\[ \hat{\beta}_1 = \hat{\gamma}_1 + \hat{\gamma}_2 \hat{\pi}\]</span></p>
 <p>where <span class="math inline">\(\hat{\pi}\)</span> is the OLS estimate from a regression of <span class="math inline">\(exper\)</span> on <span class="math inline">\(educ\)</span>. The bivariate and multivariate regressions we ran provide us with three of these coefficients, i.e. <span class="math display">\[.052 = .093 + .041 \hat{\pi}\]</span></p>
@@ -420,9 +420,9 @@ summary(multivariate_OLS)$r.squared</code></pre>
 summary(multivariate_OLS)$adj.r.squared</code></pre>
 <pre><code>## [1] 0.1644984</code></pre>
 </div>
-<div id="fwl-theorem" class="section level4">
-<h4>FWL Theorem</h4>
-<p>The FWL theorem says that whether we run the multivariate regression as above leads to the same coefficient on education as if we (i) run an OLS regression of education on our controls and (ii) run an OLS regression of log wages on the residual obtained from the regression in (i). We already ran the multivariate regression above, so we can here implement the two step procedure to see if we get the same coefficient on education. To implement the procedure, run the following code:</p>
+<div id="frisch-waugh-theorem" class="section level3">
+<h3>Frisch-Waugh theorem</h3>
+<p>The Frisch-Waugh theorem says that whether we run the multivariate regression as above leads to the same coefficient on education as if we (i) run an OLS regression of education on our controls and (ii) run an OLS regression of log wages on the residual obtained from the regression in (i). We already ran the multivariate regression above, so we can here implement the two step procedure to see if we get the same coefficient on education. To implement the procedure, run the following code:</p>
 <pre class="r"><code># first step OLs
 step1 &lt;- lm(educ ~ IQ + exper, data=data_for_analysis, na.action=na.exclude)
 # get residuals for step 1

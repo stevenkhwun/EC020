@@ -134,7 +134,7 @@ multivar_OLS <- lm(lwage ~ educ + exper, data=data_for_analysis)
 summary(multivar_OLS)
 ```
 
-#### Omitted variable bias formula
+### Omitted variable bias formula
 
 The fact that the coefficient on education changes when we include work experience as a control variable leads us to conclude that the estimate on education in the bivariate regression was (downward) biased. To see why this is, recall the **omitted variable bias formula**:
 
@@ -176,9 +176,9 @@ summary(multivariate_OLS)$r.squared
 summary(multivariate_OLS)$adj.r.squared
 ```
 
-#### FWL Theorem
+### Frisch-Waugh theorem
 
-The FWL theorem says that whether we run the multivariate regression as above leads to the same coefficient on education as if we (i) run an OLS regression of education on our controls and (ii) run an OLS regression of log wages on the residual obtained from the regression in (i). We already ran the multivariate regression above, so we can here implement the two step procedure to see if we get the same coefficient on education. To implement the procedure, run the following code:
+The Frisch-Waugh theorem says that whether we run the multivariate regression as above leads to the same coefficient on education as if we (i) run an OLS regression of education on our controls and (ii) run an OLS regression of log wages on the residual obtained from the regression in (i). We already ran the multivariate regression above, so we can here implement the two step procedure to see if we get the same coefficient on education. To implement the procedure, run the following code:
 
 ```{r}
 # first step OLs
