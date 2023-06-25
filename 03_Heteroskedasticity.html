@@ -193,11 +193,11 @@ dim(wage2)</code></pre>
 <div id="ols-with-heteroskedasticity-robust-standard-errors" class="section level1">
 <h1>OLS with Heteroskedasticity Robust Standard Errors</h1>
 <pre class="r"><code># run the regression
-wage2_ols1 &lt;- lm(lwage ~ educ + + exper, data=wage2)
+wage2_ols1 &lt;- lm(lwage ~ educ + exper, data=wage2)
 summary(wage2_ols1)     # homosk. SEs</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = lwage ~ educ + +exper, data = wage2)
+## lm(formula = lwage ~ educ + exper, data = wage2)
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 

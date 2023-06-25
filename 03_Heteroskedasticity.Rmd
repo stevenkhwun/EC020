@@ -32,7 +32,7 @@ dim(wage2)
 
 ```{r}
 # run the regression
-wage2_ols1 <- lm(lwage ~ educ + + exper, data=wage2)
+wage2_ols1 <- lm(lwage ~ educ + exper, data=wage2)
 summary(wage2_ols1)     # homosk. SEs
 ```
 
