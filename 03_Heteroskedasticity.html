@@ -311,6 +311,13 @@ summary(BP_step2)</code></pre>
 ## Multiple R-squared:  0.004363,   Adjusted R-squared:  0.002226 
 ## F-statistic: 2.042 on 2 and 932 DF,  p-value: 0.1303</code></pre>
 <p>The resulting F-statistic is <span class="math inline">\(2.042\)</span> with a p-value of <span class="math inline">\(0.1303\)</span>, implying that we fail to reject the null hypothesis of homoskedasticity. Hence, the Breusch-Pagan test confirms what we suspected when looking at the data visually: we do not seem to have a heteroskedasticity problem.</p>
+<pre class="r"><code># Breusch_Pagan Test using lmtest package
+bptest(wage2_ols1)</code></pre>
+<pre><code>## 
+##  studentized Breusch-Pagan test
+## 
+## data:  wage2_ols1
+## BP = 4.0793, df = 2, p-value = 0.1301</code></pre>
 </div>
 <div id="white-test" class="section level2">
 <h2>White Test</h2>

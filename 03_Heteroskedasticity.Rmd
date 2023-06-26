@@ -117,6 +117,13 @@ summary(BP_step2)
 The resulting F-statistic is $2.042$ with a p-value of $0.1303$, implying that we fail to reject the null hypothesis of homoskedasticity. Hence, the Breusch-Pagan test confirms what we suspected when looking at the data visually: we do not seem to have a heteroskedasticity problem.
 
 
+```{r}
+# Breusch_Pagan Test using lmtest package
+bptest(wage2_ols1)
+```
+
+
+
 ## White Test
 
 There are two cases of the White test. The first and general case regresses the residuals squared on education, experience, as well as the square of each term plus their interaction. The second more special case of the White test regresses the residuals squared on the fitted values of log wages as well as the square of these fitted values. Otherwise, the test procedure is analogous to the Breusch-Pagan test discussed above. In R, this is all very straightforward, i.e. 
