@@ -1,0 +1,70 @@
+---
+title: 'Heteroskedasticity'
+date: "2023/6/22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+> Learning points:
+>
+> * calculate heteroskedasticity robust standard errors using `coeftest()` function
+> * F-test under heteroskedasticity assumption using `linearHypothesis()` function
+> * use `ggplot()` function of the `ggplot2` package
+
+This document is adapted from the article [How to Perform Weighted Least Squares Regression in R](https://www.statology.org/weighted-least-squares-in-r/) on statology.org.
+
+
+
+# Create the Data
+
+The following code creates a data frame that contains the number of hours studied and the corresponding exam score for 16 students:
+
+```{r}
+df <- data.frame(hours=c(1,1,2,2,2,3,4,4,4,5,5,5,6,6,7,8),
+                 score=c(48,78,72,70,66,92,93,75,75,80,95,97,90,96,99,99))
+```
+
+# Perform Linear Regression
+
+```{r}
+# fit simple linear regression model
+model <- lm(score ~ hours, data=df)
+summary(model)
+```
+
+# Test for Heteroscedasticity
+
+Next, we’ll create a residual vs. fitted values plot to visually check for heteroscedasticity:
+
+```{r}
+# create residual vs. fitted plot
+plot(fitted(model), resid(model), xlab="Fitted Values", ylab="Residuals")
+abline(0,0)        # add a horizontal line at 0
+```
+
+We can see from the plot that the residuals exhibit a “cone” shape – they’re not distributed with equal variance throughout the plot. 
+
+To formally test for heteroscedasticity, we can perform a Breusch-Pagan test:
+
+```{r message=FALSE}
+# perform Breusch-Pagan test
+library(lmtest)     # load the required package
+bptest(model)       # perform Breusch-Pagan test
+```
+
+The Breusch-Pagan test uses the following null and alternative hypotheses:
+
+* Null Hypothesis ($H_0$): Homoscedasticity is present (the residuals are distributed with equal variance)
+* Alternative Hypothesis ($H_a$): Heteroscedasticity is present (the residuals are not distributed with equal variance)
+
+Since the p-value from the test is $0.0466$ we will reject the null hypothesis and conclude that heteroscedasticity is a problem in this model.
+
+# Perform Weighted Least Squares Regression
+
+Since heteroscedasticity is present, we will perform weighted least squares by defining the weights in such a way that the observations with lower variance are given more weight:
+
+
