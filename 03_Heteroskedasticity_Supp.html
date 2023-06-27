@@ -234,6 +234,40 @@ bptest(model)       # perform Breusch-Pagan test</code></pre>
 <li>Null Hypothesis (<span class="math inline">\(H_0\)</span>): Homoscedasticity is present (the residuals are distributed with equal variance)</li>
 <li>Alternative Hypothesis (<span class="math inline">\(H_a\)</span>): Heteroscedasticity is present (the residuals are not distributed with equal variance)</li>
 </ul>
+<p>Since the p-value from the test is <span class="math inline">\(0.0466\)</span> we will reject the null hypothesis and conclude that heteroscedasticity is a problem in this model.</p>
+</div>
+<div id="perform-weighted-least-squares-regression" class="section level1">
+<h1>Perform Weighted Least Squares Regression</h1>
+<p>Since heteroscedasticity is present, we will perform weighted least squares by defining the weights in such a way that the observations with lower variance are given more weight:</p>
+<pre class="r"><code># define weights to use
+wt &lt;- 1 / lm(abs(model$residuals) ~ model$fitted.values)$fitted.values^2</code></pre>
+<pre class="r"><code># perform weighted least squares regression
+wls_model &lt;- lm(score ~ hours, data=df, weights=wt)
+summary(wls_model)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = score ~ hours, data = df, weights = wt)
+## 
+## Weighted Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -2.0167 -0.9263 -0.2589  0.9873  1.6977 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  63.9689     5.1587  12.400 6.13e-09 ***
+## hours         4.7091     0.8709   5.407 9.24e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.199 on 14 degrees of freedom
+## Multiple R-squared:  0.6762, Adjusted R-squared:  0.6531 
+## F-statistic: 29.24 on 1 and 14 DF,  p-value: 9.236e-05</code></pre>
+<p>From the output we can see that the coefficient estimate for the predictor variable hours changed a bit and the overall fit of the model improved.</p>
+<p>The weighted least squares model has a residual standard error of <span class="math inline">\(1.199\)</span> compared to <span class="math inline">\(9.224\)</span> in the original simple linear regression model.</p>
+<p>This indicates that the predicted values produced by the weighted least squares model are much closer to the actual observations compared to the predicted values produced by the simple linear regression model.</p>
+<p>The weighted least squares model also has an R-squared of <span class="math inline">\(0.6762\)</span> compared to <span class="math inline">\(0.6296\)</span> in the original simple linear regression model.</p>
+<p>This indicates that the weighted least squares model is able to explain more of the variance in exam scores compared to the simple linear regression model.</p>
+<p>These metrics indicate that the weighted least squares model offers a better fit to the data compared to the simple linear regression model.</p>
 </div>
 
 

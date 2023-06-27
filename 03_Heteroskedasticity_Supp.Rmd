@@ -67,4 +67,25 @@ Since the p-value from the test is $0.0466$ we will reject the null hypothesis a
 
 Since heteroscedasticity is present, we will perform weighted least squares by defining the weights in such a way that the observations with lower variance are given more weight:
 
+```{r}
+# define weights to use
+wt <- 1 / lm(abs(model$residuals) ~ model$fitted.values)$fitted.values^2
+```
 
+```{r}
+# perform weighted least squares regression
+wls_model <- lm(score ~ hours, data=df, weights=wt)
+summary(wls_model)
+```
+
+From the output we can see that the coefficient estimate for the predictor variable hours changed a bit and the overall fit of the model improved.
+
+The weighted least squares model has a residual standard error of $1.199$ compared to $9.224$ in the original simple linear regression model.
+
+This indicates that the predicted values produced by the weighted least squares model are much closer to the actual observations compared to the predicted values produced by the simple linear regression model.
+
+The weighted least squares model also has an R-squared of $0.6762$ compared to $0.6296$ in the original simple linear regression model.
+
+This indicates that the weighted least squares model is able to explain more of the variance in exam scores compared to the simple linear regression model.
+
+These metrics indicate that the weighted least squares model offers a better fit to the data compared to the simple linear regression model.
