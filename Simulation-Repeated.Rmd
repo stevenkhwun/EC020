@@ -35,7 +35,7 @@ var(ybar)
 
 # simulated density
 plot(density(ybar))
-curve( dnorm(x, 10, sqrt(.04)), add = TRUE, lty = 2)
+curve( dnorm(x, 10, sqrt(var(ybar))), add = TRUE, lty = 2)
 ```
 
 # Line types in R : `lty`
