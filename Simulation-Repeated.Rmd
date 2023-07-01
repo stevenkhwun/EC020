@@ -1,0 +1,73 @@
+---
+title: 'Simulation-Repeated'
+date: "2023/6/22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This file is based on Script 1.38 and 1.39 of Heiss' book.
+
+```{r}
+# set the random seed
+set.seed(123456)
+
+#initialize ybar to a vector of length r=10000 for storing results
+ybar <- numeric(10000)
+
+# repeat 10000 times
+for (j in 1:10000) {
+  # Draw a sample and store the sample mean in ybar
+  sample <- rnorm(100, 10, 2)
+  ybar[j] <- mean(sample)
+}
+
+# the first 20 of 10000 estimates
+ybar[1:20]
+
+# simulated mean
+mean(ybar)
+
+# simulated variance
+var(ybar)
+
+# simulated density
+plot(density(ybar))
+curve( dnorm(x, 10, sqrt(.04)), add = TRUE, lty = 2)
+```
+
+# Line types in R : `lty`
+
+The different line types available in R are shown in the figure hereafter. The argument `lty` can be used to specify the line type. To change line width, the argument `lwd` can be used.
+
+line type (`lty`) can be specified using either text (“blank”, “solid”, “dashed”, “dotted”, “dotdash”, “longdash”, “twodash”) or number (0, 1, 2, 3, 4, 5, 6). Note that `lty` = “solid” is identical to `lty=1`.
+
+```{r}
+# Solid line (by default)
+plot(1:10, 1:10, type="l")
+# Use dashed line type
+plot(1:10, 1:10, type="l", lty=2)
+# Change line width
+plot(1:10, 1:10, type="l", lty=2, lwd=3)
+```
+
+Note that the option `type="l"` ("l" is the small letter of "L", not "1" (one))means it is a line plot. If this option is skipped, the default plot is a dot plot.
+
+```{r}
+#Line types
+#++++++++++++++++++++++++++++++++++++++++++++
+generateRLineTypes<-function(){
+  oldPar<-par()
+  par(font=2, mar=c(0,0,0,0))
+  plot(1, pch="", ylim=c(0,6), xlim=c(0,0.7),  axes=FALSE,xlab="", ylab="")
+  for(i in 0:6) lines(c(0.3,0.7), c(i,i), lty=i, lwd=3)
+  text(rep(0.1,6), 0:6, labels=c("0.'blank'", "1.'solid'", "2.'dashed'", "3.'dotted'",
+                                 "4.'dotdash'", "5.'longdash'", "6.'twodash'"))
+  par(mar=oldPar$mar,font=oldPar$font )
+}
+generateRLineTypes()
+```
+
+See the [online reference](http://www.sthda.com/english/wiki/line-types-in-r-lty#:~:text=line%20type%20(lty)%20can%20be,is%20identical%20to%20lty%3D1.) for the above discussion.
