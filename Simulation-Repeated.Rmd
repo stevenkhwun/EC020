@@ -71,3 +71,20 @@ generateRLineTypes()
 ```
 
 See the [online reference](http://www.sthda.com/english/wiki/line-types-in-r-lty#:~:text=line%20type%20(lty)%20can%20be,is%20identical%20to%20lty%3D1.) for the above discussion.
+
+
+# Normal curve that describes the histogram
+
+```{r}
+# other than the "unit Normal"
+w<-rnorm(10000, mean=10, sd=2) 
+hist(w, col="red", freq=F, xlim=10+c(-5,5), ylim = c(0,0.2))
+curve( dnorm(x, mean=10,sd=2), 5, 15, add=T, col="blue")
+```
+
+```{r}
+# unit normal
+w<-rnorm(1000) 
+hist(w,col="red",freq=F,xlim=c(-5,5))
+curve(dnorm,-5,5,add=T,col="blue")
+```
