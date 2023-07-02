@@ -32,6 +32,7 @@ b1hat <- numeric(10000)
 
 par(mfrow=c(2,2))
 
+
 for (n in c(5,10,100,1000)) {
   # draw a sample of x, fixed over replications:
   x <- rnorm(n,4,1)
@@ -49,5 +50,9 @@ for (n in c(5,10,100,1000)) {
   plot(density(b1hat), main = "", paste("n =", n, sep = " "))
   curve( dnorm(x, 0.5, sqrt(var(b1hat))), add = TRUE, lty = 2 )
 }
+
+# add main title
+mtext("Density of b1hat with different sample sizes: normal error terms",
+      side = 3, line = -2, outer = TRUE)
 ```
 
