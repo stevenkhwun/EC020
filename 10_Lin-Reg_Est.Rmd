@@ -1,8 +1,13 @@
 ---
 title: 'Linear Regression: Estimation'
 date: "2023/6/22"
-output: html_document
+output:
+  pdf_document: default
+  word_document: default
+  html_document:
+    number_sections: true
 ---
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
