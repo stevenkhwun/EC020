@@ -1,0 +1,55 @@
+---
+title: 'Instrumental Variables Estimation and Two Stage Least Squares'
+date: "2023/7/4"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+> Learning points:
+>
+> * calculate heteroskedasticity robust standard errors using `coeftest()` function
+> * F-test under heteroskedasticity assumption using `linearHypothesis()` function
+> * use `ggplot()` function of the `ggplot2` package
+
+
+
+# Return to education for married women
+
+```{r message=FALSE, warning=FALSE}
+library(foreign); library(AER); library(stargazer); library(wooldridge)
+data(mroz)
+
+# restrict to non-missing wage observations
+oursample <- subset(mroz, !is.na(wage))
+
+# OLS slope parameter manually
+with(oursample, cov(log(wage),educ) / var(educ))
+
+# IV slope parameter manually
+with(oursample, cov(log(wage),fatheduc) / cov(educ,fatheduc))
+
+# OLS automatically
+reg.ols <- lm(log(wage) ~ educ, data=oursample)
+
+# IV automatically
+reg.iv <- ivreg(log(wage) ~ educ | fatheduc, data=oursample)
+
+# pretty regression table
+stargazer(reg.ols, reg.iv, type="text")
+
+```
+
+
+```{r}
+# Example 15.2 on p. 502
+data(wage2)
+
+# IV automatically
+reg.iv2 <- ivreg(log(wage) ~ educ | sibs, data=wage2)
+stargazer(reg.iv2, type="text")
+```
+
