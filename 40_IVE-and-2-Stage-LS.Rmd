@@ -20,7 +20,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # Return to education for married women
 
 ```{r message=FALSE, warning=FALSE}
-library(foreign); library(AER); library(stargazer); library(wooldridge)
+library(AER); library(stargazer); library(wooldridge)
 data(mroz)
 
 # restrict to non-missing wage observations
