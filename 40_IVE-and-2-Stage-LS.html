@@ -251,6 +251,63 @@ stargazer(reg.iv2, type=&quot;text&quot;)</code></pre>
 ## Residual Std. Error      0.423 (df = 933)      
 ## ===============================================
 ## Note:               *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre class="r"><code># Complete Example 15.2
+
+# load the data
+data(wage2, package=&quot;wooldridge&quot;)
+
+# variable educ and sibs are correlated
+reg &lt;- lm(educ ~ sibs, data = wage2)
+stargazer(reg, type = &quot;text&quot;)</code></pre>
+<pre><code>## 
+## ===============================================
+##                         Dependent variable:    
+##                     ---------------------------
+##                                educ            
+## -----------------------------------------------
+## sibs                         -0.228***         
+##                               (0.030)          
+##                                                
+## Constant                     14.139***         
+##                               (0.113)          
+##                                                
+## -----------------------------------------------
+## Observations                    935            
+## R2                             0.057           
+## Adjusted R2                    0.056           
+## Residual Std. Error      2.134 (df = 933)      
+## F Statistic           56.667*** (df = 1; 933)  
+## ===============================================
+## Note:               *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre class="r"><code># run the ols and iv estimation
+olsreg &lt;- lm(log(wage) ~ educ, data = wage2)
+ivreg1 &lt;- ivreg(log(wage) ~ educ | sibs, data = wage2)
+
+# compare the result
+stargazer(olsreg, ivreg1, type = &quot;text&quot;)</code></pre>
+<pre><code>## 
+## ====================================================================
+##                                         Dependent variable:         
+##                                -------------------------------------
+##                                              log(wage)              
+##                                          OLS            instrumental
+##                                                           variable  
+##                                          (1)                (2)     
+## --------------------------------------------------------------------
+## educ                                   0.060***           0.122***  
+##                                        (0.006)            (0.026)   
+##                                                                     
+## Constant                               5.973***           5.130***  
+##                                        (0.081)            (0.355)   
+##                                                                     
+## --------------------------------------------------------------------
+## Observations                             935                935     
+## R2                                      0.097              -0.009   
+## Adjusted R2                             0.096              -0.010   
+## Residual Std. Error (df = 933)          0.400              0.423    
+## F Statistic                    100.700*** (df = 1; 933)             
+## ====================================================================
+## Note:                                    *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
 </div>
 
 

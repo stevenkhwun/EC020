@@ -53,3 +53,21 @@ reg.iv2 <- ivreg(log(wage) ~ educ | sibs, data=wage2)
 stargazer(reg.iv2, type="text")
 ```
 
+```{r}
+# Complete Example 15.2
+
+# load the data
+data(wage2, package="wooldridge")
+
+# variable educ and sibs are correlated
+reg <- lm(educ ~ sibs, data = wage2)
+stargazer(reg, type = "text")
+
+# run the ols and iv estimation
+olsreg <- lm(log(wage) ~ educ, data = wage2)
+ivreg1 <- ivreg(log(wage) ~ educ | sibs, data = wage2)
+
+# compare the result
+stargazer(olsreg, ivreg1, type = "text")
+```
+
