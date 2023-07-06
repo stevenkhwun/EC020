@@ -180,12 +180,14 @@ pre code {
 </ul>
 </blockquote>
 <p>The natural logarithm of 10 is 2.303.</p>
+<p>We first load the required packages and datasets.</p>
+<pre class="r"><code># load the required library
+library(AER); library(stargazer); library(wooldridge)
+# load the required dataset
+data(list=c(&quot;card&quot;, &quot;mroz&quot;, &quot;wage2&quot;), wooldridge)</code></pre>
 <div id="instrumental-variables-in-simple-regression-models" class="section level1">
 <h1>Instrumental variables in simple regression models</h1>
-<pre class="r"><code>library(AER); library(stargazer); library(wooldridge)
-data(mroz)
-
-# restrict to non-missing wage observations
+<pre class="r"><code># restrict to non-missing wage observations
 oursample &lt;- subset(mroz, !is.na(wage))
 
 # OLS slope parameter manually
@@ -226,7 +228,6 @@ stargazer(reg.ols, reg.iv, type=&quot;text&quot;)</code></pre>
 ## ===================================================================
 ## Note:                                   *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
 <pre class="r"><code># Example 15.2 on p. 502
-data(wage2)
 
 # IV automatically
 reg.iv2 &lt;- ivreg(log(wage) ~ educ | sibs, data=wage2)
@@ -251,9 +252,6 @@ stargazer(reg.iv2, type=&quot;text&quot;)</code></pre>
 ## ===============================================
 ## Note:               *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
 <pre class="r"><code># Complete Example 15.2
-
-# load the data
-data(wage2, package=&quot;wooldridge&quot;)
 
 # variable educ and sibs are correlated
 reg &lt;- lm(educ ~ sibs, data = wage2)
@@ -313,12 +311,12 @@ stargazer(olsreg, ivreg1, type = &quot;text&quot;)</code></pre>
 <p>We use <code>card</code> data to estimate the return to education. Education is allowed to be endogenous and instrumented with the dummy variable <code>near4</code> which indicates whether the individual grew up close to a college.</p>
 <p>We first check for relevance by regressing the endogenous independent variable <code>educ</code> on all exogenous variables including the instrument <code>near4</code>.</p>
 <pre class="r"><code># reduced form equation: check for relevance
-data(card)
 redf &lt;- lm(educ ~ nearc4 + exper + I(exper^2) + black + smsa + south + smsa66 +
             reg662 + reg663 + reg664 + reg665 + reg666 + reg667 + reg668 + reg669,
           data = card)
-stargazer(redf, keep=c(&quot;nearc4&quot;), type=&quot;text&quot;)</code></pre>
+stargazer(redf, keep=c(&quot;nearc4&quot;), type=&quot;text&quot;, title = &quot;Reduced form equation&quot;)</code></pre>
 <pre><code>## 
+## Reduced form equation
 ## ===============================================
 ##                         Dependent variable:    
 ##                     ---------------------------
@@ -349,8 +347,9 @@ iv &lt;- ivreg(log(wage) ~ educ + exper + I(exper^2) + black + smsa + south + sm
             reg669, data = card)
 
 # table of the results
-stargazer(ols, iv, keep=c(&quot;ed&quot;, &quot;exp&quot;, &quot;bl&quot;), type=&quot;text&quot;)</code></pre>
+stargazer(ols, iv, keep=c(&quot;ed&quot;, &quot;exp&quot;, &quot;bl&quot;), type=&quot;text&quot;, title = &quot;OLS vs IV estimation&quot;)</code></pre>
 <pre><code>## 
+## OLS vs IV estimation
 ## ======================================================================
 ##                                          Dependent variable:          
 ##                                 --------------------------------------

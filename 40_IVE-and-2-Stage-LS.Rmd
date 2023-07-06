@@ -15,12 +15,19 @@ knitr::opts_chunk$set(echo = TRUE)
 
 The natural logarithm of 10 is `r format(log(10), digit=4)`.
 
+We first load the required packages and datasets.
+
+```{r message=FALSE, warning=FALSE}
+# load the required library
+library(AER); library(stargazer); library(wooldridge)
+# load the required dataset
+data(list=c("card", "mroz", "wage2"), wooldridge)
+```
+
+
 # Instrumental variables in simple regression models
 
 ```{r message=FALSE, warning=FALSE}
-library(AER); library(stargazer); library(wooldridge)
-data(mroz)
-
 # restrict to non-missing wage observations
 oursample <- subset(mroz, !is.na(wage))
 
@@ -47,7 +54,6 @@ stargazer(reg.ols, reg.iv, type="text")
 
 ```{r}
 # Example 15.2 on p. 502
-data(wage2)
 
 # IV automatically
 reg.iv2 <- ivreg(log(wage) ~ educ | sibs, data=wage2)
@@ -56,9 +62,6 @@ stargazer(reg.iv2, type="text")
 
 ```{r}
 # Complete Example 15.2
-
-# load the data
-data(wage2, package="wooldridge")
 
 # variable educ and sibs are correlated
 reg <- lm(educ ~ sibs, data = wage2)
@@ -81,11 +84,10 @@ We first check for relevance by regressing the endogenous independent variable `
 
 ```{r}
 # reduced form equation: check for relevance
-data(card)
 redf <- lm(educ ~ nearc4 + exper + I(exper^2) + black + smsa + south + smsa66 +
             reg662 + reg663 + reg664 + reg665 + reg666 + reg667 + reg668 + reg669,
           data = card)
-stargazer(redf, keep=c("nearc4"), type="text")
+stargazer(redf, keep=c("nearc4"), type="text", title = "Reduced form equation")
 ```
 
 The parameter for `nearc4` is highly significantly different from zero, so relevance is supported. We then estimate the log wage equation with OLS and IV.
@@ -104,7 +106,7 @@ iv <- ivreg(log(wage) ~ educ + exper + I(exper^2) + black + smsa + south + smsa6
             reg669, data = card)
 
 # table of the results
-stargazer(ols, iv, keep=c("ed", "exp", "bl"), type="text")
+stargazer(ols, iv, keep=c("ed", "exp", "bl"), type="text", title = "OLS vs IV estimation")
 ```
 
 > Notes on R
