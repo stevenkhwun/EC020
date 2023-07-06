@@ -176,13 +176,11 @@ pre code {
 <blockquote>
 <p>Learning points:</p>
 <ul>
-<li>calculate heteroskedasticity robust standard errors using <code>coeftest()</code> function</li>
-<li>F-test under heteroskedasticity assumption using <code>linearHypothesis()</code> function</li>
-<li>use <code>ggplot()</code> function of the <code>ggplot2</code> package</li>
+<li>conducting IV estimation by <code>ivreg()</code> function of <code>AER</code> package</li>
 </ul>
 </blockquote>
-<div id="return-to-education-for-married-women" class="section level1">
-<h1>Return to education for married women</h1>
+<div id="instrumental-variables-in-simple-regression-models" class="section level1">
+<h1>Instrumental variables in simple regression models</h1>
 <pre class="r"><code>library(AER); library(stargazer); library(wooldridge)
 data(mroz)
 

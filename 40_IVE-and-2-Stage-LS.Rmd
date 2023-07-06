@@ -11,13 +11,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 > Learning points:
 >
-> * calculate heteroskedasticity robust standard errors using `coeftest()` function
-> * F-test under heteroskedasticity assumption using `linearHypothesis()` function
-> * use `ggplot()` function of the `ggplot2` package
+> * conducting IV estimation by `ivreg()` function of `AER` package
 
 
 
-# Return to education for married women
+# Instrumental variables in simple regression models
 
 ```{r message=FALSE, warning=FALSE}
 library(AER); library(stargazer); library(wooldridge)
@@ -42,6 +40,9 @@ reg.iv <- ivreg(log(wage) ~ educ | fatheduc, data=oursample)
 stargazer(reg.ols, reg.iv, type="text")
 
 ```
+
+
+
 
 
 ```{r}
