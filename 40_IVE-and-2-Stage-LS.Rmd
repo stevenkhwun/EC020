@@ -1,7 +1,11 @@
 ---
 title: 'Instrumental Variables Estimation and Two Stage Least Squares'
 date: "2023/7/4"
-output: html_document
+output:
+  pdf_document: default
+  word_document: default
+  html_document:
+    number_sections: true
 ---
 
 ```{r setup, include=FALSE}
@@ -13,7 +17,6 @@ knitr::opts_chunk$set(echo = TRUE)
 >
 > * conducting IV estimation by `ivreg()` function of `AER` package
 
-The natural logarithm of 10 is `r format(log(10), digit=4)`.
 
 We first load the required packages and datasets.
 
@@ -26,6 +29,33 @@ data(list=c("card", "mroz", "wage2"), wooldridge)
 
 
 # Instrumental variables in simple regression models
+
+We are concerned with estimating the following wage equation
+$$log(wage_i) = \alpha_0 + \alpha_1 educ_i + \epsilon_i$$
+
+In words, we want to look at the effects of education on log wages. To do this we will use the `CARD` dataset, available in the `wooldridge` package in R. We know that `educ` is an endogeneous variable. As such, running a simple OLS regression on the above regression will yield a biased estimate. We will therefore need (at least) one instrument. 
+
+## Using one instrument
+
+We use the instrument variable, namely `nearc4`, a dummy variable indicating proximity to a four-year college. In order to be a valid instrument, we need this distance measure (a) to be correlated with education (**instrument relevance**: the instrument and the endogeneous regressor are correlated, and (b) not to affect log wages other than through education (**instrument exogeneity**: the instrument and the error are uncorrelated). We cannot test our exogeneity assumption (you can try to think for yourself whether you think that it is satisfied in this case), but we can test the relevance assumption.
+
+To test the relevance assumption, we simple run an OLS regression of `educ` on `nearc4`. In addition to the standard errors on the assumption of homoskedasticity, we alos report heteroskedastic robust standard errors.
+
+```{r}
+# relevance assumption
+card_FS1 <- lm(educ ~ nearc4, data = card)
+# heteroskedastic SEs
+robust.se <- coeftest(card_FS1, vcov = vcovHC(card_FS1, type = "HC1"))
+# report the result
+stargazer(card_FS1, card_FS1, se=list(NULL, robust.se[,2]), column.labels=c("default","robust"), 
+          type = "text")
+```
+
+The relevance assumption requires that `educ` and `nearc4` are strongly correlated. We can test this by looking at whether the coefficient on `nearc4` (`r format(robust.se[2,1], digit=4)` in our regression) is statistically significantly different from zero. Given the *t*-statistic of `r format(robust.se[2,3], digit=4)` (or the *p*-value that's essentially zero), we conclude that this coefficient is statistically significantly different from zero. Thus, the relevance assumption should be valid. 
+
+
+# Further examples
+
 
 ```{r message=FALSE, warning=FALSE}
 # restrict to non-missing wage observations

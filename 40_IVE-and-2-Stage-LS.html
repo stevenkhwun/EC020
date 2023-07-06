@@ -179,14 +179,53 @@ pre code {
 <li>conducting IV estimation by <code>ivreg()</code> function of <code>AER</code> package</li>
 </ul>
 </blockquote>
-<p>The natural logarithm of 10 is 2.303.</p>
 <p>We first load the required packages and datasets.</p>
 <pre class="r"><code># load the required library
 library(AER); library(stargazer); library(wooldridge)
 # load the required dataset
 data(list=c(&quot;card&quot;, &quot;mroz&quot;, &quot;wage2&quot;), wooldridge)</code></pre>
-<div id="instrumental-variables-in-simple-regression-models" class="section level1">
-<h1>Instrumental variables in simple regression models</h1>
+<div id="instrumental-variables-in-simple-regression-models" class="section level1" number="1">
+<h1 number="1"><span class="header-section-number">1</span> Instrumental variables in simple regression models</h1>
+<p>We are concerned with estimating the following wage equation <span class="math display">\[log(wage_i) = \alpha_0 + \alpha_1 educ_i + \epsilon_i\]</span></p>
+<p>In words, we want to look at the effects of education on log wages. To do this we will use the <code>CARD</code> dataset, available in the <code>wooldridge</code> package in R. We know that <code>educ</code> is an endogeneous variable. As such, running a simple OLS regression on the above regression will yield a biased estimate. We will therefore need (at least) one instrument.</p>
+<div id="using-one-instrument" class="section level2" number="1.1">
+<h2 number="1.1"><span class="header-section-number">1.1</span> Using one instrument</h2>
+<p>We use the instrument variable, namely <code>nearc4</code>, a dummy variable indicating proximity to a four-year college. In order to be a valid instrument, we need this distance measure (a) to be correlated with education (<strong>instrument relevance</strong>: the instrument and the endogeneous regressor are correlated, and (b) not to affect log wages other than through education (<strong>instrument exogeneity</strong>: the instrument and the error are uncorrelated). We cannot test our exogeneity assumption (you can try to think for yourself whether you think that it is satisfied in this case), but we can test the relevance assumption.</p>
+<p>To test the relevance assumption, we simple run an OLS regression of <code>educ</code> on <code>nearc4</code>. In addition to the standard errors on the assumption of homoskedasticity, we alos report heteroskedastic robust standard errors.</p>
+<pre class="r"><code># relevance assumption
+card_FS1 &lt;- lm(educ ~ nearc4, data = card)
+# heteroskedastic SEs
+robust.se &lt;- coeftest(card_FS1, vcov = vcovHC(card_FS1, type = &quot;HC1&quot;))
+# report the result
+stargazer(card_FS1, card_FS1, se=list(NULL, robust.se[,2]), column.labels=c(&quot;default&quot;,&quot;robust&quot;), 
+          type = &quot;text&quot;)</code></pre>
+<pre><code>## 
+## ============================================================
+##                                     Dependent variable:     
+##                                 ----------------------------
+##                                             educ            
+##                                    default        robust    
+##                                      (1)            (2)     
+## ------------------------------------------------------------
+## nearc4                             0.829***      0.829***   
+##                                    (0.104)        (0.107)   
+##                                                             
+## Constant                          12.698***      12.698***  
+##                                    (0.086)        (0.090)   
+##                                                             
+## ------------------------------------------------------------
+## Observations                        3,010          3,010    
+## R2                                  0.021          0.021    
+## Adjusted R2                         0.020          0.020    
+## Residual Std. Error (df = 3008)     2.649          2.649    
+## F Statistic (df = 1; 3008)        63.912***      63.912***  
+## ============================================================
+## Note:                            *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<p>The relevance assumption requires that <code>educ</code> and <code>nearc4</code> are strongly correlated. We can test this by looking at whether the coefficient on <code>nearc4</code> (0.829 in our regression) is statistically significantly different from zero. Given the <em>t</em>-statistic of 7.77 (or the <em>p</em>-value that’s essentially zero), we conclude that this coefficient is statistically significantly different from zero. Thus, the relevance assumption should be valid.</p>
+</div>
+</div>
+<div id="further-examples" class="section level1" number="2">
+<h1 number="2"><span class="header-section-number">2</span> Further examples</h1>
 <pre class="r"><code># restrict to non-missing wage observations
 oursample &lt;- subset(mroz, !is.na(wage))
 
@@ -306,8 +345,8 @@ stargazer(olsreg, ivreg1, type = &quot;text&quot;)</code></pre>
 ## ====================================================================
 ## Note:                                    *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
 </div>
-<div id="more-exogenous-regressors-example-15.4-of-wooldridge" class="section level1">
-<h1>More exogenous regressors (Example 15.4 of Wooldridge)</h1>
+<div id="more-exogenous-regressors-example-15.4-of-wooldridge" class="section level1" number="3">
+<h1 number="3"><span class="header-section-number">3</span> More exogenous regressors (Example 15.4 of Wooldridge)</h1>
 <p>We use <code>card</code> data to estimate the return to education. Education is allowed to be endogenous and instrumented with the dummy variable <code>near4</code> which indicates whether the individual grew up close to a college.</p>
 <p>We first check for relevance by regressing the endogenous independent variable <code>educ</code> on all exogenous variables including the instrument <code>near4</code>.</p>
 <pre class="r"><code># reduced form equation: check for relevance
