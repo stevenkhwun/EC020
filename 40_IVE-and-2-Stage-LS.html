@@ -179,6 +179,7 @@ pre code {
 <li>conducting IV estimation by <code>ivreg()</code> function of <code>AER</code> package</li>
 </ul>
 </blockquote>
+<p>The natural logarithm of 10 is 2.303.</p>
 <div id="instrumental-variables-in-simple-regression-models" class="section level1">
 <h1>Instrumental variables in simple regression models</h1>
 <pre class="r"><code>library(AER); library(stargazer); library(wooldridge)
@@ -306,6 +307,82 @@ stargazer(olsreg, ivreg1, type = &quot;text&quot;)</code></pre>
 ## F Statistic                    100.700*** (df = 1; 933)             
 ## ====================================================================
 ## Note:                                    *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+</div>
+<div id="more-exogenous-regressors-example-15.4-of-wooldridge" class="section level1">
+<h1>More exogenous regressors (Example 15.4 of Wooldridge)</h1>
+<p>We use <code>card</code> data to estimate the return to education. Education is allowed to be endogenous and instrumented with the dummy variable <code>near4</code> which indicates whether the individual grew up close to a college.</p>
+<p>We first check for relevance by regressing the endogenous independent variable <code>educ</code> on all exogenous variables including the instrument <code>near4</code>.</p>
+<pre class="r"><code># reduced form equation: check for relevance
+data(card)
+redf &lt;- lm(educ ~ nearc4 + exper + I(exper^2) + black + smsa + south + smsa66 +
+            reg662 + reg663 + reg664 + reg665 + reg666 + reg667 + reg668 + reg669,
+          data = card)
+stargazer(redf, keep=c(&quot;nearc4&quot;), type=&quot;text&quot;)</code></pre>
+<pre><code>## 
+## ===============================================
+##                         Dependent variable:    
+##                     ---------------------------
+##                                educ            
+## -----------------------------------------------
+## nearc4                       0.320***          
+##                               (0.088)          
+##                                                
+## -----------------------------------------------
+## Observations                   3,010           
+## R2                             0.477           
+## Adjusted R2                    0.474           
+## Residual Std. Error      1.941 (df = 2994)     
+## F Statistic         182.129*** (df = 15; 2994) 
+## ===============================================
+## Note:               *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<p>The parameter for <code>nearc4</code> is highly significantly different from zero, so relevance is supported. We then estimate the log wage equation with OLS and IV.</p>
+<pre class="r"><code># OLS
+ols &lt;- lm(log(wage) ~ educ + exper + I(exper^2) + black + smsa + south + smsa66 +
+          reg662 + reg663 + reg664 + reg665 + reg666 + reg667 + reg668 + reg669,
+          data = card)
+
+# IV
+iv &lt;- ivreg(log(wage) ~ educ + exper + I(exper^2) + black + smsa + south + smsa66 +
+            reg662 + reg663 + reg664 + reg665 + reg666 + reg667 + reg668 + reg669 |
+            nearc4 + exper + I(exper^2) + black + smsa + south + smsa66 +
+            reg662 + reg663 + reg664 + reg665 + reg666 + reg667 + reg668 +
+            reg669, data = card)
+
+# table of the results
+stargazer(ols, iv, keep=c(&quot;ed&quot;, &quot;exp&quot;, &quot;bl&quot;), type=&quot;text&quot;)</code></pre>
+<pre><code>## 
+## ======================================================================
+##                                          Dependent variable:          
+##                                 --------------------------------------
+##                                               log(wage)               
+##                                            OLS            instrumental
+##                                                             variable  
+##                                            (1)                (2)     
+## ----------------------------------------------------------------------
+## educ                                    0.075***            0.132**   
+##                                          (0.003)            (0.055)   
+##                                                                       
+## exper                                   0.085***            0.108***  
+##                                          (0.007)            (0.024)   
+##                                                                       
+## I(exper2)                               -0.002***          -0.002***  
+##                                         (0.0003)            (0.0003)  
+##                                                                       
+## black                                   -0.199***          -0.147***  
+##                                          (0.018)            (0.054)   
+##                                                                       
+## ----------------------------------------------------------------------
+## Observations                              3,010              3,010    
+## R2                                        0.300              0.238    
+## Adjusted R2                               0.296              0.234    
+## Residual Std. Error (df = 2994)           0.372              0.388    
+## F Statistic                     85.476*** (df = 15; 2994)             
+## ======================================================================
+## Note:                                      *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<blockquote>
+<p>Notes on R</p>
+<p>In <code>ivreg()</code>, we have to include the exogenous variables both to the list of regressors left of the <code>|</code> symbol and to the list of exogenous instrument to the right of the <code>|</code> symbol.</p>
+</blockquote>
 </div>
 
 
